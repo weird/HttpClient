@@ -1,14 +1,13 @@
 <?php
-/**
- *MEF_PROXY_ADDR
- *
- * */
+ /** 
+* HttpClient
+* @author weird <weird@sina.com>
+*/
 class HttpClient {
     const PROXY_NONE = 0;
     const PROXY_SOCKS4 = 1;
     const PROXY_SOCKS5 = 2;
     const PROXY_HTTP = 4;
-
     //请求送头
     private $_require_header=array();
     //请求Cookie信息
@@ -126,26 +125,8 @@ class HttpClient {
             foreach($cookies as $cookie) {
 				$cookie = trim($cookie);
 				$arr = explode('=', $cookie);
-				//找出值
 				$value = implode('=',array_slice($arr,1,count($arr)));;
 				$ret[trim($arr[0])] = $value;
-				/*
-				for($i=0;$i<count($arr);$i++){
-					$len++;
-					if(substr(trim($arr[$i]),0,1)==='"'){
-						$value = implode('=',array_slice($arr,$i,count($arr)));
-						break;
-					}
-					$value = $arr[$i];
-				}
-				//
-				for($i=0;$i<$len-1;$i++){
-					$k = trim($arr[$i]);
-					if(!in_array(strtolower($k),$ext) && $k!='') {
-						$ret[$k] = $value;
-					}
-				}
-				*/
 			  }
         }
         return $ret;
@@ -221,8 +202,6 @@ class HttpClient {
                     }
                     //auth
                     if($auth_method == 2) {
-						//$code = pack("CC",0x01,strlen($this->_proxy_user)).$this->_proxy_user.pack("C",strlen($this->_proxy_pass)).$this->_proxy_pass;
-						//socket_write($sock,$code);
 						socket_write($sock, chr(1).chr(strlen($this->_proxy_user)).$this->_proxy_user.chr(strlen($this->_proxy_pass)).$this->_proxy_pass);
                         $buf = socket_read($sock,2,PHP_BINARY_READ);
                         if(substr($buf,-1) != 0x00) {
@@ -232,7 +211,6 @@ class HttpClient {
                         }
                     }
                     //step2
-					// socket_write($sock, chr(5).chr(1).chr(0).chr(1).pack('Nn', ip2long($host_ip), $port));
 					//使用代理的dns服务器
 					socket_write($sock, pack("C5", 0x05, 0x01, 0x00, 0x03, strlen($host)).$host.pack("n", $port));
                     $buf = socket_read($sock,2,PHP_BINARY_READ);
