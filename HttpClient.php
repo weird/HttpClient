@@ -34,7 +34,6 @@ class HttpClient {
     private $_error;
 
     private $_mimes = array(
-			'php' => 'image/jpeg',
             'gif' => 'image/gif',
             'png' => 'image/png',
             'bmp' => 'image/bmp',
@@ -373,7 +372,7 @@ class HttpClient {
 
     private  function get_mime($file) {
         $arr =  explode('.', $file);
-        $ext = strtolower(count($arr)-1);
+        $ext = strtolower($arr[count($arr)-1]);
         if(isset($this->_mimes[$ext])) {
             return $this->_mimes[$ext];
         }else {
