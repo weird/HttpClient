@@ -133,7 +133,7 @@ class HttpClient {
     //初始化请求数据
     private function init_require() {
         $this->_require_header = array(
-                'Accept'=>'Accept: */*',
+                'Accept'=>'*/*',
                 'Accept-Language'=>'zh-cn',
                 'User-Agent'=>'Mozilla/5.0 (Windows; U; Windows NT 5.1; zh-CN; rv:1.9.2.3) Gecko/20100401 Firefox/3.6.3',
                 'Connection'=>'close');
