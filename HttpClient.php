@@ -221,6 +221,7 @@ class HttpClient {
                     }
                     break;
                 case HttpClient::PROXY_HTTP:
+                    $path = $this->_require_uri;
                     $this->_require_header['Proxy-Connection'] = 'Close';
                     if(!empty($this->_proxy_user)) {
                         $this->_require_header['Proxy-Authorization'] = 'Basic '.base64_encode($this->_proxy_user.':'.$this->_proxy_pass);
