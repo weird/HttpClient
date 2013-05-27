@@ -30,6 +30,8 @@ class HttpClient {
     private $_proxy_user;
     //代理认证密码
     private $_proxy_pass;
+	//cookie持久访问
+	private $_keep_cookie = true;
 
     private $_error;
 
@@ -76,6 +78,10 @@ class HttpClient {
     public function set_header($k,$v) {
         $this->_require_header[$k] = $v;
     }
+	
+	public function remove_header($k) {
+        unset($this->_require_header);
+    }
 
     public function set_cookie($k,$v) {
         $this->_require_cookie[$k] =$v;
@@ -110,6 +116,10 @@ class HttpClient {
             $this->_proxy_pass = $p;
         }
     }
+
+	public function keep_cookie($v){
+		$this->_keep_cookie = $v;
+	}
     public function HttpClient() {
         $this->init_require();
         $this->init_response();
@@ -133,7 +143,7 @@ class HttpClient {
     //初始化请求数据
     private function init_require() {
         $this->_require_header = array(
-                'Accept'=>'*/*',
+                'Accept'=>'Accept: */*',
                 'Accept-Language'=>'zh-cn',
                 'User-Agent'=>'Mozilla/5.0 (Windows; U; Windows NT 5.1; zh-CN; rv:1.9.2.3) Gecko/20100401 Firefox/3.6.3',
                 'Connection'=>'close');
@@ -142,10 +152,13 @@ class HttpClient {
 
     //初始化回发数据
     private function init_response() {
+		$this->remove_header('Content-Type');
         $this->_response_header = array();
         $this->_response_body = '';
-        $this->_response_cookie = array();
         $this->_response_status = 0;
+		if(!$this->_keep_cookie){
+			$this->_response_cookie = array();
+		}
     }
 
     //发送请求
@@ -157,9 +170,8 @@ class HttpClient {
         !isset($matches['port']) && $matches['port'] = '';
         $host = $matches['host'];
         $path = $matches['path'] ? $matches['path'].($matches['query'] ? '?'.$matches['query'] : '') : '/';
-        $port = !empty($matches['port']) ? $matches['port'] : 80;
-
         $this->_require_header['Host']= $host.($port == 80 ? '' :(':'.$port));
+
         if(!isset($this->_require_header['Referer']))  $this->_require_header['Referer'] = $this->_require_uri;
 
         $sock = socket_create(AF_INET,SOCK_STREAM, SOL_TCP);
@@ -221,7 +233,7 @@ class HttpClient {
                     }
                     break;
                 case HttpClient::PROXY_HTTP:
-                    $path = $this->_require_uri;
+					$path = $this->_require_uri;
                     $this->_require_header['Proxy-Connection'] = 'Close';
                     if(!empty($this->_proxy_user)) {
                         $this->_require_header['Proxy-Authorization'] = 'Basic '.base64_encode($this->_proxy_user.':'.$this->_proxy_pass);
@@ -268,6 +280,9 @@ class HttpClient {
                     $this->_response_status = intval($status[1]);
              }elseif(!strncasecmp('Set-Cookie: ', $line, 12)) {
                      $this->_response_cookie = array_merge($this->_response_cookie,$this->cookie_str2arr(substr($line, 12)));
+					 if($this->_keep_cookie){
+						$this->_require_cookie = array_merge($this->_require_cookie,$this->_response_cookie);
+					 }
               }else {
                     $header = explode(':',$line,2);
                     if(count($header) == 2) $this->_response_header[$header[0]] = trim($header[1]);
