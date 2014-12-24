@@ -18,7 +18,7 @@ $data = array(
 $file = array( 
 	'photo'=>'/data/patch/file.jpg' 
 ); 
-$http->get('http://www.example.com/',array($data)[,$file]); 
+$http->post('http://www.example.com/',array($data)[,$file]); 
 echo $http->get_body(); 
 ```
 
