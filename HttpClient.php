@@ -170,6 +170,7 @@ class HttpClient {
         !isset($matches['port']) && $matches['port'] = '';
         $host = $matches['host'];
         $path = $matches['path'] ? $matches['path'].($matches['query'] ? '?'.$matches['query'] : '') : '/';
+        $port = $matches['port'] ? $matches['port']: 80;
         $this->_require_header['Host']= $host.($port == 80 ? '' :(':'.$port));
 
         if(!isset($this->_require_header['Referer']))  $this->_require_header['Referer'] = $this->_require_uri;
@@ -327,7 +328,6 @@ class HttpClient {
         }
         $this->_require_header['Content-Length'] = strlen($post);
 
-        $this->init_response();
         $this->send('post',$post);
         $this->init_require();
     }
